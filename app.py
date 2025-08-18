@@ -47,7 +47,7 @@ safety_settings = [
 
 try:
     model = genai.GenerativeModel(
-        model_name="gemini-2.5-flash",
+        model_name="gemini-1.5-flash", # Corrected model name
         generation_config=generation_config,
         safety_settings=safety_settings,
         system_instruction=SYSTEM_INSTRUCTION,
@@ -67,14 +67,23 @@ os.makedirs(PREDICTION_FOLDER, exist_ok=True)
 # Temporary storage for prediction inputs
 prediction_inputs = {}
 
+# --- Page Serving Routes (Corrected) ---
 @app.route('/')
 def home():
-    return render_template('chatbot.html')
+    # This route now serves the main landing page.
+    return render_template('home.html')
 
-@app.route('/predictor', methods=['GET'])
+@app.route('/predictor')
 def predictor():
+    # This route serves the predictor tool page.
     return render_template('predictor.html')
 
+@app.route('/chatbot')
+def chatbot_page():
+    # This new route serves the chatbot/AI assistant page.
+    return render_template('chatbot.html')
+
+# --- API Endpoints ---
 @app.route('/chat', methods=['POST'])
 def chat():
     user_message = request.json.get('message')
@@ -99,7 +108,7 @@ def load_sample():
         if len(df) < 2:
             return jsonify({'response': 'Test CSV has fewer than 2 rows.'}), 400
         # Get the second row (index 1) and exclude the ID column
-        sample_row = df.iloc[1].to_dict()
+        sample_row = df.iloc[0].to_dict()
         sample_row.pop('ID', None)
         return jsonify(sample_row)
     except Exception as e:
@@ -183,13 +192,15 @@ def predict_stream(session_id):
                     df.to_csv(output_path, index=False)
                     # Show all rows if <= 10, else top 10
                     preview_df = df if len(df) <= 10 else df.head(10)
-                    yield f"data: {json.dumps({
+                    # CORRECTED: The dictionary and json.dumps call are now on a single line within the f-string.
+                    data_to_send = {
                         'progress': 100,
                         'blend': 'Complete',
                         'preview': create_modern_table_html(preview_df),
                         'download_url': f'/download/{output_filename}',
                         'total_predictions': len(df)
-                    })}\n\n"
+                    }
+                    yield f"data: {json.dumps(data_to_send)}\n\n"
                 else:
                     yield f"data: {json.dumps(progress_data)}\n\n"
             # Clean up
