@@ -1,0 +1,1 @@
+{"embed_dim": 512, "num_layers": 6, "num_heads": 8, "dropout": 0.10853875455024573, "batch_size": 32, "learning_rate": 0.00012093134774024999, "weight_decay": 1.6104723248832257e-05, "gradient_clip_norm": 0.8321252164223925}

@@ -1,0 +1,516 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synth-Fuel | Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000; /* Pure Black Background */
+            color: #cbd5e1;
+        }
+        
+        .glass-panel {
+            background-color: #14141c; /* Dark Charcoal/Indigo color */
+            border: 1px solid #2a2a3a; /* Harmonized border */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-input {
+            background-color: rgba(2, 6, 23, 0.7);
+            border: 1px solid #1e293b;
+            color: #e2e8f0;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .form-input::placeholder { color: #475569; }
+        .form-input:focus {
+            background-color: #020617;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
+        }
+        
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #38bdf8, #3b82f6);
+            transition: width 0.4s ease-in-out;
+        }
+        
+        .loader {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 5px solid #1e293b;
+            border-top-color: #38bdf8;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Enhanced border animation for Analyze CSV button */
+        .animated-border {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .animated-border::before {
+            content: '';
+            position: absolute;
+            inset: -4px; /* Thicker border */
+            border-radius: 0.75rem;
+            padding: 4px;
+            background: linear-gradient(
+                45deg,
+                #38bdf8,
+                #3b82f6,
+                #10b981,
+                #facc15,
+                #f97316,
+                #ef4444,
+                #38bdf8
+            );
+            background-size: 400%;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: border-flow 4s linear infinite;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5), 0 0 25px rgba(59, 130, 246, 0.3);
+        }
+        @keyframes border-flow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 400% 0%; }
+        }
+        .animated-border:hover::before {
+            animation: border-flow 1.5s linear infinite;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.7), 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+        .animated-border:hover {
+            transform: scale(1.05);
+        }
+
+        /* Modern progress bar for prediction */
+        .modern-progress-container {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            background: #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+        .modern-progress-fill {
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                #38bdf8 0%,
+                #3b82f6 20%,
+                #10b981 40%,
+                #facc15 60%,
+                #f97316 80%,
+                #ef4444 100%
+            );
+            background-size: 200%;
+            transition: width 0.5s ease-in-out;
+            animation: shimmer 2s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+        .modern-progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        .modern-progress-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, #38bdf8, #10b981, #facc15) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: border-flow 3s linear infinite;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Updated to Match Home Page Style -->
+    <header class="bg-black/50 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-800">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3">
+                <svg class="w-8 h-8 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m-3-1l-3-1m3 1v5.25M7.5 3l3 1.636M7.5 3L6 3.545M7.5 3v5.25m6.75-5.25v5.25m0 0l3 1m-3-1l-3-1m-3 1l3-1m-3 1v5.25" /></svg>
+                <span class="text-2xl font-bold text-white">Synth-Fuel</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8 text-slate-300">
+                <a href="index.html#challenge" class="hover:text-sky-400 transition-colors">The Challenge</a>
+                <a href="index.html#solution" class="hover:text-sky-400 transition-colors">Our Solution</a>
+                <a href="home.html" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-5 rounded-lg transition-all shadow-lg shadow-sky-500/20">Home</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Predictor Section -->
+        <section id="predictor" class="py-12 sm:py-24">
+            <div class="container mx-auto px-6">
+                <!-- Main Prediction Panel -->
+                <div class="glass-panel w-full max-w-5xl mx-auto p-6 sm:p-10 rounded-3xl shadow-2xl">
+                    <div id="form-header" class="text-center mb-8">
+                        <h2 class="text-4xl font-bold text-white">Blend Property Predictor</h2>
+                        <p class="mt-4 text-slate-400">Use the form for a single prediction or upload a CSV to analyze the entire file.</p>
+                    </div>
+
+                    <!-- Status area for uploads -->
+                    <div id="upload-status-container" class="text-center mb-6 hidden">
+                        <p id="upload-status" class="text-slate-300"></p>
+                    </div>
+
+                    <div class="mb-8"><div class="bg-slate-800 w-full h-2.5 rounded-full"><div id="progress-bar" class="progress-bar-fill h-2.5 rounded-full" style="width: 0%;"></div></div><div id="step-indicator" class="text-center mt-3 text-sm text-slate-400 font-medium"></div></div>
+                    <form id="prediction-form" class="relative min-h-[220px]"></form>
+                    <input type="file" id="csv-upload-input" class="hidden" accept=".csv">
+                    <div class="flex justify-between items-center mt-8">
+                        <div class="flex items-center gap-4">
+                            <button id="upload-csv-btn" type="button" class="animated-border bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-lg transition-all shadow-lg shadow-sky-500/20 text-sm">Analyze CSV</button>
+                            <button id="load-sample-btn" type="button" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-lg transition-all shadow-lg shadow-sky-500/20 text-sm">Load Sample</button>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button id="prev-btn" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-lg transition-all">Previous</button>
+                            <button id="next-btn" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-lg transition-all shadow-lg shadow-sky-500/20">Next</button>
+                            <button type="submit" form="prediction-form" id="submit-btn" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-lg transition-all shadow-lg shadow-sky-500/20 hidden">Run Prediction</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Results section -->
+                <div id="results-section" class="mt-12 max-w-5xl mx-auto">
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl text-center text-slate-400">
+                        <h3 class="text-xl font-semibold text-white mb-2">Ready for Analysis</h3>
+                        <p>Your prediction results and charts will appear here once you submit your data.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-800 py-12"><div class="container mx-auto px-6 text-center text-slate-400"><p>&copy; 2025 Synth-Fuel. A conceptual project for the Shell.ai Hackathon.</p></div></footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- DOM Elements ---
+        const form = document.getElementById('prediction-form');
+        const progressBar = document.getElementById('progress-bar');
+        const stepIndicator = document.getElementById('step-indicator');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const resultsSection = document.getElementById('results-section');
+        const uploadCsvBtn = document.getElementById('upload-csv-btn');
+        const csvUploadInput = document.getElementById('csv-upload-input');
+        const loadSampleBtn = document.getElementById('load-sample-btn');
+        const uploadStatusContainer = document.getElementById('upload-status-container');
+        const uploadStatus = document.getElementById('upload-status');
+
+        // --- State Variables ---
+        let currentStep = 0;
+        let formSteps = [];
+        const NUM_COMPONENTS = 5;
+        const NUM_PROPERTIES = 10;
+        
+        // --- Event Listeners ---
+        uploadCsvBtn.addEventListener('click', () => csvUploadInput.click());
+        csvUploadInput.addEventListener('change', handleCsvUpload);
+        loadSampleBtn.addEventListener('click', handleLoadSample);
+
+        // --- Load Sample Logic ---
+        async function handleLoadSample() {
+            try {
+                const response = await fetch('/load_sample', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error(`Failed to fetch sample data: ${response.status}`);
+                const sampleData = await response.json();
+
+                // Populate form fields
+                const allInputs = form.querySelectorAll('input[type="number"]');
+                allInputs.forEach(input => {
+                    const fieldName = input.name;
+                    if (sampleData[fieldName]) {
+                        input.value = parseFloat(sampleData[fieldName]).toFixed(4);
+                    }
+                });
+                updateTotalPercentage();
+                uploadStatusContainer.classList.remove('hidden');
+                uploadStatus.textContent = '✅ Sample data loaded successfully.';
+                uploadStatus.classList.add('text-green-400');
+            } catch (error) {
+                console.error('Load Sample Error:', error);
+                uploadStatusContainer.classList.remove('hidden');
+                uploadStatus.textContent = `❌ Error loading sample: ${error.message}`;
+                uploadStatus.classList.add('text-red-400');
+            }
+        }
+
+        // --- CSV Upload Logic ---
+        async function handleCsvUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            uploadStatusContainer.classList.remove('hidden');
+            uploadStatus.textContent = "Processing file...";
+            uploadStatus.className = 'text-slate-300';
+            resultsSection.innerHTML = `
+                <div class="glass-panel p-6 sm:p-8 rounded-2xl text-center">
+                    <h3 class="text-xl font-semibold text-white mb-4">Processing CSV Predictions</h3>
+                    <div class="modern-progress-container">
+                        <div id="modern-progress-fill" class="modern-progress-fill" style="width: 0%;"></div>
+                        <span id="modern-progress-text" class="modern-progress-text">Starting...</span>
+                    </div>
+                </div>
+            `;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Step 1: Start prediction with POST
+                const startResponse = await fetch('/start_predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!startResponse.ok) throw new Error(`Failed to start prediction: ${startResponse.status}`);
+                const { session_id } = await startResponse.json();
+
+                // Step 2: Connect to SSE stream
+                const source = new EventSource(`/predict_stream/${session_id}`);
+
+                source.onmessage = function(event) {
+                    const progressData = JSON.parse(event.data);
+                    const progressFill = document.getElementById('modern-progress-fill');
+                    const progressText = document.getElementById('modern-progress-text');
+
+                    if (progressData.error) {
+                        source.close();
+                        uploadStatus.textContent = `❌ Error: ${progressData.error}`;
+                        uploadStatus.classList.add('text-red-400');
+                        resultsSection.innerHTML = `<div class="glass-panel p-6 sm:p-8 rounded-2xl text-center text-red-400 font-medium">An error occurred: ${progressData.error}</div>`;
+                        return;
+                    }
+
+                    progressFill.style.width = `${progressData.progress}%`;
+                    progressText.textContent = `${progressData.blend} - ${Math.round(progressData.progress)}%`;
+
+                    if (progressData.progress === 100 && progressData.preview) {
+                        source.close();
+                        resultsSection.innerHTML = `
+                            <div class="glass-panel p-6 sm:p-8 rounded-2xl">
+                                <h3 class="text-2xl font-bold text-white text-center mb-4">CSV Prediction Results (${progressData.total_predictions <= 10 ? 'All Rows' : 'Top 10 Rows'})</h3>
+                                ${progressData.preview}
+                                <p class="mt-4 text-slate-400 text-center">Total Predictions: ${progressData.total_predictions}</p>
+                                <a href="${progressData.download_url}" class="mt-4 inline-block bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-lg transition-all shadow-lg shadow-sky-500/20">Download Full Results</a>
+                            </div>
+                        `;
+                        uploadStatus.textContent = `✅ Analysis complete.`;
+                        uploadStatus.classList.add('text-green-400');
+                    }
+                };
+
+                source.onerror = function() {
+                    source.close();
+                    uploadStatus.textContent = `❌ Error: Failed to get prediction. Is the server running?`;
+                    uploadStatus.classList.add('text-red-400');
+                    resultsSection.innerHTML = `<div class="glass-panel p-6 sm:p-8 rounded-2xl text-center text-red-400 font-medium">An error occurred: Failed to get prediction.</div>`;
+                };
+            } catch (error) {
+                console.error("CSV Processing Error:", error);
+                uploadStatus.textContent = `❌ Error: ${error.message}`;
+                uploadStatus.classList.add('text-red-400');
+                resultsSection.innerHTML = `<div class="glass-panel p-6 sm:p-8 rounded-2xl text-center text-red-400 font-medium">An error occurred: ${error.message}</div>`;
+            } finally {
+                event.target.value = '';
+            }
+        }
+
+        // --- Single Prediction Form Logic ---
+        function createFormSteps() {
+            let html = '';
+            html += `<div id="step-0" class="form-step"><h3 class="text-xl font-semibold mb-6 text-white">Step 1: Blend Composition</h3><div class="grid grid-cols-2 sm:grid-cols-5 gap-x-4 gap-y-6" id="composition-inputs">`;
+            for (let i = 1; i <= NUM_COMPONENTS; i++) {
+                html += `<div><label for="Component${i}_fraction" class="block text-sm font-medium text-slate-300">Component ${i} (%)</label><input type="number" id="Component${i}_fraction" name="Component${i}_fraction" min="0" max="100" step="0.01" required class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm form-input" placeholder="e.g. 20"></div>`;
+            }
+            html += `</div><div id="composition-feedback" class="mt-4 text-sm font-medium text-slate-400">Total: <span id="total-percentage">0</span>%</div></div>`;
+            for (let i = 1; i <= NUM_COMPONENTS; i++) {
+                html += `<div id="step-${i}" class="form-step hidden"><h3 class="text-xl font-semibold mb-6 text-white">Step ${i + 1}: Component ${i} Properties</h3><div class="grid grid-cols-2 sm:grid-cols-5 gap-x-4 gap-y-6">`;
+                for (let j = 1; j <= NUM_PROPERTIES; j++) {
+                    html += `<div><label for="Component${i}_Property${j}" class="block text-sm font-medium text-slate-300">Property ${j}</label><input type="number" id="Component${i}_Property${j}" name="Component${i}_Property${j}" step="any" required class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm form-input" placeholder="Value"></div>`;
+                }
+                html += `</div></div>`;
+            }
+            form.innerHTML = html;
+            formSteps = document.querySelectorAll('.form-step');
+            updateForm();
+        }
+
+        function updateForm() {
+            formSteps.forEach((step, index) => step.classList.toggle('hidden', index !== currentStep));
+            const progress = (currentStep / (formSteps.length - 1)) * 100;
+            progressBar.style.width = `${progress}%`;
+            stepIndicator.textContent = `Step ${currentStep + 1} of ${formSteps.length}`;
+            prevBtn.classList.toggle('hidden', currentStep === 0);
+            nextBtn.classList.toggle('hidden', currentStep === formSteps.length - 1);
+            submitBtn.classList.toggle('hidden', currentStep !== formSteps.length - 1);
+        }
+
+        nextBtn.addEventListener('click', () => { if (currentStep < formSteps.length - 1) { currentStep++; updateForm(); } });
+        prevBtn.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateForm(); } });
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            // Initialize modern progress bar
+            resultsSection.innerHTML = `
+                <div class="glass-panel p-6 sm:p-8 rounded-2xl text-center">
+                    <h3 class="text-xl font-semibold text-white mb-4">Processing Predictions</h3>
+                    <div class="modern-progress-container">
+                        <div id="modern-progress-fill" class="modern-progress-fill" style="width: 0%;"></div>
+                        <span id="modern-progress-text" class="modern-progress-text">Starting...</span>
+                    </div>
+                </div>
+            `;
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50');
+
+            try {
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+
+                // Step 1: Start prediction with POST
+                const startResponse = await fetch('/start_predict_single', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!startResponse.ok) throw new Error(`Failed to start prediction: ${startResponse.status}`);
+                const { session_id } = await startResponse.json();
+
+                // Step 2: Connect to SSE stream
+                const source = new EventSource(`/predict_single_stream/${session_id}`);
+
+                source.onmessage = function(event) {
+                    const progressData = JSON.parse(event.data);
+                    const progressFill = document.getElementById('modern-progress-fill');
+                    const progressText = document.getElementById('modern-progress-text');
+
+                    if (progressData.error) {
+                        source.close();
+                        displayError(`Failed to get prediction: ${progressData.error}`);
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50');
+                        return;
+                    }
+
+                    progressFill.style.width = `${progressData.progress}%`;
+                    progressText.textContent = `${progressData.blend} - ${Math.round(progressData.progress)}%`;
+
+                    if (progressData.progress === 100 && progressData.result) {
+                        source.close();
+                        displayResults(progressData.result[0]); // Single prediction uses first row
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50');
+                    }
+                };
+
+                source.onerror = function() {
+                    source.close();
+                    displayError('Failed to get prediction. Is the server running?');
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50');
+                };
+            } catch (error) {
+                console.error('Prediction Error:', error);
+                displayError(`Failed to get prediction: ${error.message}`);
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50');
+            }
+        });
+        
+        // --- Display Functions ---
+        function displayResults(predictions) {
+            const resultsHTML = `
+                <div class="glass-panel p-6 sm:p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-white text-center mb-4">Prediction Results</h3>
+                    <div class="h-[350px]"><canvas id="results-chart"></canvas></div>
+                </div>
+            `;
+            resultsSection.innerHTML = resultsHTML;
+            
+            const chartCtx = document.getElementById('results-chart').getContext('2d');
+            createChart(chartCtx, 'bar', predictions);
+        }
+
+        function createChart(ctx, type, data) {
+            new Chart(ctx, {
+                type,
+                data: {
+                    labels: Object.keys(data).map(key => key.replace('BlendProperty', 'Property ')),
+                    datasets: [{
+                        label: 'Predicted Value',
+                        data: Object.values(data),
+                        backgroundColor: 'rgba(56, 189, 248, 0.4)',
+                        borderColor: 'rgba(56, 189, 248, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+        
+        function displayError(message) {
+            resultsSection.innerHTML = `<div class="glass-panel p-6 sm:p-8 rounded-2xl text-center text-red-400 font-medium">An error occurred: ${message}</div>`;
+        }
+
+        function updateTotalPercentage() {
+            const inputs = document.querySelectorAll('#composition-inputs input');
+            let total = 0;
+            inputs.forEach(input => { total += parseFloat(input.value) || 0; });
+            document.getElementById('total-percentage').textContent = total.toFixed(2);
+            const feedbackDiv = document.getElementById('composition-feedback');
+            if (Math.abs(total - 100) > 0.01) {
+                feedbackDiv.classList.add('text-red-400');
+            } else {
+                feedbackDiv.classList.remove('text-red-400');
+            }
+        }
+        
+        // --- Initial Setup ---
+        createFormSteps();
+        form.addEventListener('input', (e) => { if (e.target.name && e.target.name.includes('_fraction')) updateTotalPercentage(); });
+    });
+    </script>
+</body>
+</html>

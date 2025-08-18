@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synth-Fuel | Expert AI-Powered Blend Prediction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000; /* Pure Black Background */
+            color: #cbd5e1;
+        }
+
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .glass-panel {
+            background-color: #14141c; /* Dark Charcoal/Indigo color */
+            border: 1px solid #2a2a3a; /* Harmonized border */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover .glass-panel {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px -10px rgba(56, 189, 248, 0.15);
+        }
+        
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .hero-gradient-text {
+            background: -webkit-linear-gradient(45deg, #7dd3fc, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-icon-circle {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+            border: 1px solid #334155;
+            transition: transform 0.4s ease-out;
+        }
+
+        #spotlight {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(56, 189, 248, 0) 60%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: background 0.2s;
+            z-index: 9999;
+        }
+
+        /* Typing Animation Styles */
+        .typing-container {
+            display: inline-block;
+        }
+        .typing-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2rem;
+            background-color: #7dd3fc;
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+        }
+        @keyframes blink {
+            from, to { background-color: transparent }
+            50% { background-color: #7dd3fc; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="spotlight"></div>
+
+    <!-- Header -->
+    <header class="bg-black/50 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-800">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3"><svg class="w-8 h-8 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m-3-1l-3-1m3 1v5.25M7.5 3l3 1.636M7.5 3L6 3.545M7.5 3v5.25m6.75-5.25v5.25m0 0l3 1m-3-1l-3-1m-3 1l3-1m-3 1v5.25" /></svg><span class="text-2xl font-bold text-white">Synth-Fuel</span></a>
+            <div class="hidden md:flex items-center space-x-8 text-slate-300"><a href="#challenge" class="hover:text-sky-400 transition-colors">The Challenge</a><a href="#solution" class="hover:text-sky-400 transition-colors">Our Solution</a><a href="predictor.html" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-5 rounded-lg transition-all shadow-lg shadow-sky-500/20">Home</a></div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="relative h-screen flex items-center justify-center text-center overflow-hidden">
+            <canvas id="hero-canvas"></canvas>
+            <div class="relative z-10 container mx-auto px-6"><h1 class="text-5xl sm:text-7xl font-extrabold text-white leading-tight drop-shadow-2xl">The Future of Fuel, <br> <span class="hero-gradient-text">Synthesized by AI</span></h1><p class="mt-6 max-w-2xl mx-auto text-lg text-slate-300">Our advanced machine learning platform deciphers the complex chemistry of fuel blending, enabling rapid development of sustainable, high-performance energy.</p><a href="predictor.html" class="mt-8 inline-block bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-8 rounded-lg transition-transform shadow-2xl shadow-sky-500/30">Start Your Analysis</a></div>
+        </section>
+
+        <!-- The Challenge Section -->
+        <section id="challenge" class="py-24 bg-black/20"><div class="container mx-auto px-6 fade-in-section"><div class="text-center max-w-3xl mx-auto"><h2 class="text-4xl font-bold text-white">A New Frontier in Energy Science</h2><p class="mt-4 text-slate-400">Blending sustainable components to create stable, efficient, and regulation-compliant fuels is a high-dimensional puzzle. Traditional R&D is slow, expensive, and resource-intensive. We needed a digital leap forward.</p></div></div></section>
+
+        <!-- Live AI Insights Section -->
+        <section id="live-insights" class="py-24"><div class="container mx-auto px-6 fade-in-section">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="glass-panel p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-white">Large Language Model</h3>
+                        <div class="flex space-x-1.5">
+                            <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                            <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                            <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                        </div>
+                    </div>
+                    <div class="bg-black/50 p-4 rounded-lg min-h-[240px] text-slate-300 space-y-4">
+                        <div class="flex items-start gap-3">
+                            <img src="https://avatar.vercel.sh/human.svg" class="w-6 h-6 rounded-full flex-shrink-0" alt="User Icon">
+                            <div class="bg-slate-700 rounded-lg p-3 text-sm min-h-[3rem]">
+                                <span id="ai-question" class="typing-container"></span>
+                            </div>
+                        </div>
+                        <div class="opacity-0 flex items-start gap-3 justify-end" id="ai-answer-container">
+                             <div class="bg-slate-800 rounded-lg p-3 text-sm min-h-[3rem]">
+                                <span id="ai-answer" class="typing-container"></span>
+                            </div>
+                            <img src="https://avatar.vercel.sh/ai.svg" class="w-6 h-6 rounded-full flex-shrink-0" alt="AI Icon">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-4xl font-bold text-white">Generative AI</h2>
+                    <p class="mt-4 text-slate-400">Powering the next generation of Generative AI. Synth-Fuel integrates advanced LLMs to provide not just predictions, but actionable insights, model evaluation, safety, and alignment.</p>
+                    <div class="mt-6 flex items-center gap-6">
+                        <a href="#" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-5 rounded-lg transition-all shadow-lg shadow-sky-500/20">Chat with AI</a>
+                    </div>
+                </div>
+            </div>
+        </div></section>
+
+        <!-- Solution Section -->
+        <section id="solution" class="py-24"><div class="container mx-auto px-6 fade-in-section"><div class="text-center mb-16"><h2 class="text-4xl font-bold text-white">The Synth-Fuel Solution</h2><p class="mt-4 text-slate-400 max-w-2xl mx-auto">We transform months of lab work into seconds of computation with a three-pronged approach.</p></div><div class="grid md:grid-cols-3 gap-8">
+            <div class="feature-card"><div class="glass-panel p-8 rounded-2xl text-center h-full"><div class="feature-icon-circle h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg"><svg class="w-8 h-8 text-sky-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg></div><h3 class="text-xl font-bold text-white">Instantaneous Prediction</h3><p class="mt-2 text-slate-400">Our ML core evaluates thousands of potential blend ratios and component properties in real-time.</p></div></div>
+            <div class="feature-card"><div class="glass-panel p-8 rounded-2xl text-center h-full"><div class="feature-icon-circle h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg"><svg class="w-8 h-8 text-sky-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.553L16.5 21.75l-.398-1.197a3.375 3.375 0 00-2.456-2.456L12.75 18l1.197-.398a3.375 3.375 0 002.456-2.456L16.5 14.25l.398 1.197a3.375 3.375 0 002.456 2.456L20.25 18l-1.197.398a3.375 3.375 0 00-2.456 2.456z" /></svg></div><h3 class="text-xl font-bold text-white">✨ AI-Powered Analysis</h3><p class="mt-2 text-slate-400">Leverage the Gemini API to get expert analysis and recommendations for any blend.</p></div></div>
+            <div class="feature-card"><div class="glass-panel p-8 rounded-2xl text-center h-full"><div class="feature-icon-circle h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg"><svg class="w-8 h-8 text-sky-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg></div><h3 class="text-xl font-bold text-white">Advanced Visualization</h3><p class="mt-2 text-slate-400">Analyze results with interactive bar and radar charts to uncover hidden insights.</p></div></div>
+        </div></div></section>
+    </main>
+
+    <footer class="border-t border-slate-800 py-12"><div class="container mx-auto px-6 text-center text-slate-400"><p>&copy; 2025 Synth-Fuel. A conceptual project for the Shell.ai Hackathon.</p></div></footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- Three.js Hero Canvas ---
+        let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
+        const heroCanvas = document.getElementById('hero-canvas');
+        if (heroCanvas) { init3D(); animate3D(); window.addEventListener('resize', onWindowResize); }
+        function init3D() { scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); camera.position.z = 5; renderer = new THREE.WebGLRenderer({ canvas: heroCanvas, alpha: true }); renderer.setSize(window.innerWidth, window.innerHeight); const particleCount = 5000; const particlesGeometry = new THREE.BufferGeometry(); const posArray = new Float32Array(particleCount * 3); for (let i = 0; i < particleCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 10; } particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3)); const particlesMaterial = new THREE.PointsMaterial({ size: 0.005, color: 0x38bdf8 }); particles = new THREE.Points(particlesGeometry, particlesMaterial); scene.add(particles); }
+        function animate3D() { requestAnimationFrame(animate3D); particles.rotation.y += -0.0002; particles.rotation.x += -0.0001; camera.position.x += (mouseX - camera.position.x) * 0.01; camera.position.y += (-mouseY - camera.position.y) * 0.01; camera.lookAt(scene.position); renderer.render(scene, camera); }
+        function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
+        
+        // --- Spotlight and Feature Card Interactivity ---
+        const spotlight = document.getElementById('spotlight');
+        document.addEventListener('mousemove', (e) => {
+            spotlight.style.left = e.pageX + 'px';
+            spotlight.style.top = e.pageY + 'px';
+            mouseX = (e.clientX - window.innerWidth / 2) / 100;
+            mouseY = (e.clientY - window.innerHeight / 2) / 100;
+        });
+
+        // --- AI Insights Typing Animation ---
+        const aiQuestionEl = document.getElementById('ai-question');
+        const aiAnswerEl = document.getElementById('ai-answer');
+        const aiAnswerContainer = document.getElementById('ai-answer-container');
+        const question = "Why is human feedback necessary for accurate llm responses?";
+        const answer = "LLMs are not always truthful or aligned with human preferences.";
+
+        function typeWriter(element, text, speed, onComplete) {
+            let i = 0;
+            element.innerHTML = "";
+            const cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            element.appendChild(cursor);
+
+            function type() {
+                if (i < text.length) {
+                    element.insertBefore(document.createTextNode(text.charAt(i)), cursor);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    cursor.style.display = 'none';
+                    if (onComplete) onComplete();
+                }
+            }
+            type();
+        }
+
+        function runTypingAnimation() {
+            aiQuestionEl.innerHTML = '';
+            aiAnswerEl.innerHTML = '';
+            aiAnswerContainer.style.opacity = 0;
+
+            typeWriter(aiQuestionEl, question, 50, () => {
+                setTimeout(() => {
+                    aiAnswerContainer.style.opacity = 1;
+                    typeWriter(aiAnswerEl, answer, 50, () => {
+                        setTimeout(runTypingAnimation, 4000); // Loop after 4 seconds
+                    });
+                }, 1000);
+            });
+        }
+
+        const insightsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    runTypingAnimation();
+                    insightsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.6 });
+
+        const insightsSection = document.getElementById('live-insights');
+        if (insightsSection) {
+            insightsObserver.observe(insightsSection);
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in-section').forEach(section => observer.observe(section));
+    });
+    </script>
+</body>
+</html>
