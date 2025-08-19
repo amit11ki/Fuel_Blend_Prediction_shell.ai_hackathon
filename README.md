@@ -231,6 +231,8 @@ This project was developed for the Shell.ai Hackathon 2025. Please refer to the 
 
 - [Shell.ai Hackathon](https://www.hackerearth.com/challenges/new/competitive/shellai-hackathon-2025/)
 - [Competition Details](https://www.hackerearth.com/challenges/competitive/shellai-hackathon-2025/leaderboard/)
+- [PPT Link](https://docs.google.com/presentation/d/1V9IP2-MMwO88JcPr4D9M-F7ik3Gg2KwV/edit?usp=sharing&ouid=106203342667501477179&rtpof=true&sd=true)
+- [Demo Video Link](https://drive.google.com/file/d/1vjtmmlIMzNBMZZLfPlow6gAl9cbU6RZ1/view?usp=drivesdk)
 
 ---
 
