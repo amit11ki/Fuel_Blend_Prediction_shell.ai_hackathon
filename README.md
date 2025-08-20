@@ -16,7 +16,7 @@ The global push for sustainability is transforming industries, particularly in m
 ## 🏗️ Project Structure
 
 ```
-fuel_blend_prediction/
+fuel-blend-prediction/
 │
 ├── 📄 app.py                          # Main Flask application
 ├── ⚙️ config.py                       # Configuration settings
@@ -90,8 +90,8 @@ fuel_blend_prediction/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd fuel_blend_prediction
+   git clone https://gitlab.com/harshilsangani07/fuel-blend-prediction
+   cd fuel-blend-prediction
    ```
 
 2. **Install dependencies**
