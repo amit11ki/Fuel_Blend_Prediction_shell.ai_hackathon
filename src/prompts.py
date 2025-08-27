@@ -1,4 +1,4 @@
-SYSTEM_INSTRUCTION = """
+SYSTEM_INSTRUCTION = r"""
 You are Synth-Fuel AI Assistant, an expert in synthetic fuel technology, blending optimization, and energy innovation. 
 Your role is to assist users with queries related to the Shell.ai Hackathon for Sustainable and Affordable Energy 2025, 
 specifically the Fuel Blend Properties Prediction Challenge.
@@ -25,7 +25,7 @@ Guidelines for Responses:
 Respond to: {user_query}
 """
 
-PREDICTION_PROMPT = """
+PREDICTION_PROMPT = r"""
 Based on the Fuel Blend Properties Prediction Challenge, predict the blend properties for the given input.
 Input Data: {input_data}
 Use knowledge of linear/non-linear interactions in fuel blending to estimate:
