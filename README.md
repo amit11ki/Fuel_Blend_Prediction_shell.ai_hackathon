@@ -140,16 +140,16 @@ Built a comprehensive Flask-based platform featuring:
 
 | Blend Property | Model Type | Architecture | Validation Score |
 |---------------|------------|--------------|------------------|
-| Property 1 | Random Forest | Ensemble | High |
+| Property 1 | Bayesian Ridge | Linear model | High |
 | Property 2 | FT-Transformer | Transformer | High |
-| Property 3 | Neural Network | Deep Learning | High |
+| Property 3 | FT-Transformer | Transformer | High |
 | Property 4 | FT-Transformer | Transformer | High |
-| Property 5 | Feature Selected | ML + Selection | High |
-| Property 6 | Random Forest | Ensemble | High |
-| Property 7 | Two-Stage NN | Hierarchical | High |
-| Property 8 | Advanced NN | Deep Learning | High |
+| Property 5 | Random Forest | Enesemble    | High |
+| Property 6 | Bayesian Ridge | Linear model| High |
+| Property 7 | FT-Transformer | Transformer | High |
+| Property 8 | FT-Transformer | Transformer | High |
 | Property 9 | FT-Transformer | Transformer | High |
-| Property 10 | Ensemble | Multi-Model | High |
+| Property 10 | Bayesian Ridge | Linear model | High |
 
 **Final Public Leaderboard Score: 97.05 (1st Place 🥇)**
 
@@ -237,6 +237,7 @@ This project was developed for the Shell.ai Hackathon 2025. Please refer to the 
 ---
 
 *Built with ❤️ for sustainable energy solutions*
+
 
 
 
