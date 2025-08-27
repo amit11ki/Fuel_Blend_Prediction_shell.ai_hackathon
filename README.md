@@ -31,7 +31,7 @@ fuel-blend-prediction/
 │   └── samplyu.csv                   # Additional sample data
 │
 ├── 🤖 models/                        # Trained models for each blend property
-│   ├── Blend-1/                      # Random Forest model (joblib)
+│   ├── Blend-1/                      # Bayesian Ridge (joblib)
 │   │   ├── model_BlendProperty1.joblib
 │   │   └── predictions_BlendProperty1.csv
 │   │
@@ -46,12 +46,12 @@ fuel-blend-prediction/
 │   │   └── scaler.gz
 │   │
 │   ├── Blend-4/                      # FT-Transformer with K-Fold
-│   ├── Blend-5/                      # Feature-selected model
-│   ├── Blend-6/                      # Random Forest variant
-│   ├── Blend-7/                      # Two-stage neural network
+│   ├── Blend-5/                      # Random Forest variant
+│   ├── Blend-6/                      # Bayesian Ridge
+│   ├── Blend-7/                      # Two-stage FT-Transformer network
 │   ├── Blend-8/                      # Advanced neural network
-│   ├── Blend-9/                      # FT-Transformer variant
-│   └── Blend-10/                     # Final ensemble model
+│   ├── Blend-9/                      # FT-Transformer with K-Fold
+│   └── Blend-10/                     # Bayesian Ridge
 │
 ├── 📈 predictions/                   # Generated prediction files
 │   └── predictions_all_blends_*.csv  # Timestamped prediction outputs
@@ -237,6 +237,7 @@ This project was developed for the Shell.ai Hackathon 2025. Please refer to the 
 ---
 
 *Built with ❤️ for sustainable energy solutions*
+
 
 
 
