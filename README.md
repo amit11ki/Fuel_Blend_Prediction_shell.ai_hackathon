@@ -91,7 +91,7 @@ fuel-blend-prediction/
 1. **Clone the repository**
    ```bash
    git clone https://github.com/amit11ki/Fuel_Blend_Prediction_shell.ai_hackathon.git
-   cd fuel-blend-prediction
+   cd Fuel_Blend_Prediction_shell.ai_hackathon
    ```
 
 2. **Install dependencies**
@@ -237,6 +237,7 @@ This project was developed for the Shell.ai Hackathon 2025. Please refer to the 
 ---
 
 *Built with ❤️ for sustainable energy solutions*
+
 
 
 
