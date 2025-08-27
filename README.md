@@ -49,7 +49,7 @@ fuel-blend-prediction/
 │   ├── Blend-5/                      # Random Forest variant
 │   ├── Blend-6/                      # Bayesian Ridge
 │   ├── Blend-7/                      # Two-stage FT-Transformer network
-│   ├── Blend-8/                      # Advanced neural network
+│   ├── Blend-8/                      # FT-Transformer with K-Fold
 │   ├── Blend-9/                      # FT-Transformer with K-Fold
 │   └── Blend-10/                     # Bayesian Ridge
 │
@@ -237,6 +237,7 @@ This project was developed for the Shell.ai Hackathon 2025. Please refer to the 
 ---
 
 *Built with ❤️ for sustainable energy solutions*
+
 
 
 
